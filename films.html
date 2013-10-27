@@ -21,8 +21,8 @@
       <a href="#" id="date-btn" data-role="button">Date</a>
     </div>
     
-    <div id="film-list-content" class="list-content" data-role="content">
-      <ul data-role="listview" data-autodividers="true" id="films">
+    <div id="film-list-content"  data-role="content">
+      <ul data-role="listview" data-autodividers="true" class="list-content" id="films">
       </ul>
     </div>
     
@@ -45,6 +45,32 @@ $("#date_header").show();
 $("#date_header").html("&nbsp;&nbsp;&nbsp;"+$(liel).attr("title"));
 });*/
 </script>
+
+
 </div>
+<div data-role="page" id="detailspage">
+
+  <header data-role="header" data-position="fixed">
+</header>
+<div data-role="content">
+  <div style="font-size: 0.8em;">
+    <a href="#" data-role="button" onClick="goBack()" data-inline="true" data-icon="arrow-l">Films</a>
+  </div>
+  <div id="film-item-list-content" data-role="content">
+      <ul data-role="listview" id="film-items">
+      </ul>
+  </div>
+  <div data-role="content" id="film-details">
+
+  </div>
+  <div data-role="content" id="dets">
+  </div>
+</div>
+<link rel="stylesheet" href="css/cinequest.css" />
+<script src="scripts/jquery.dateFormat-1.0.js" type="text/javascript"></script>
+<script src="scripts/headerbar.js" type="text/javascript"></script>
+</div>
+
+
 </body>
 </html>

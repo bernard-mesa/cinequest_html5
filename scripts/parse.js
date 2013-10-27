@@ -137,10 +137,32 @@ function printFilmItem(col){
 
 function populateFilmList(ProgramItemArray){
 	$.each(ProgramItemArray,function(){
-		var item = $('<li><a href="film_detail.html"/><input type="checkbox" name="checkbox-'+this.id+'" id="checkbox-'+this.id+'" class="custom"/>' + this.name+ '</li>');
+	//	var item = $('<li>' + this.name+ '</li>');
+		//<a href="film_detail.html"/><input type="checkbox" name="checkbox-'+this.id+'" id="checkbox-'+this.id+'" class="custom"/>
+		var item = $('<li/>');
+		var link = $('<a/>').html(this.name);
+		link.click(createLinkHandler(movetopage,this));
+		item.append(link)
 		$('#films').append(item);
 	})
 	$('#films').listview('refresh');
+}
+
+function createLinkHandler(f,i){
+	return function(){f(i);};
+}
+
+function movetopage(ProgramItem){
+	$.mobile.changePage('#detailspage');
+	$('#film-items').empty();
+	$('#film-detail').empty();
+	$.each(ProgramItem.films,function(){
+		var item = '<li>' + this.name + '</li>';
+		console.log(getFilmInfo(this));
+	//	$('#film-detail').html(item);
+		$('#film-items').append(item);
+	})
+	$('#film-items').listview('refresh');
 }
 
 /*function showProgramItemDetail(ProgramItem){
@@ -206,6 +228,10 @@ function getSingleInfo(prop,pNmae){
 }
 
 
+//$('.list-content').click(function(){
+//	$.mobile.changePage('#detailspage')
+//	$('#film-details').html('yoyo');
+//});
 
 
 //if(typeof clicked_source == 'undefined')
