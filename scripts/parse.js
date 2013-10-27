@@ -184,11 +184,11 @@ function compare(a,b) {
 }
 
 function getFilmInfo(fi){
-	var info = "<b>Film Title</b>: "  + fi.name + '<br>';
+	var info = '<img src="'+ fi.imgLink +'"/> <br>';
+	info += '<a href="' + fi.infoLink + '">Link to Movie</a><br>'
+	info += "<b>Film Title</b>: "  + fi.name + '<br>';
 	info += "<b>Duration</b>: " + fi.dura + '<br>';
 	info += "<b>Description</b>: " + fi.descript + '<br>';
-	info += "<b>Link</b>: " + fi.infoLink + '<br>';
-	info += "<b>Image</b>: " + fi.imgLink + '<br>';
 	info += getFilmProperties(fi);
 	info += getSchedule(fi)
 	return info;
