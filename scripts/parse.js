@@ -43,7 +43,7 @@ function getFilm() {
 				fi.name = pi.name;
 				pi.dura = $(this).find('Duration')[0].textContent;
 				fi.dura = pi.dura;
-				pi.descript = $(this).find('ShortDescription').text();
+				pi.descript = $(this).find('ShortDescription')[0].textContent;
 				fi.descript = pi.descript;
 				pi.imgLink = $(this).find('EventImage').text();
 				fi.imgLink = pi.imgLink;
@@ -155,29 +155,25 @@ function createLinkHandler(f,i){
 function movetopage(ProgramItem){
 	$.mobile.changePage('#detailspage');
 	$('#film-items').empty();
-	$('#film-detail').empty();
+	$('#film-details').html('');
 	$.each(ProgramItem.films,function(){
-		var item = '<li>' + this.name + '</li>';
-		console.log(getFilmInfo(this));
-	//	$('#film-detail').html(item);
+	//	var item ='<div data-role="collapsible" data-theme="b" data-content-theme="d" class="ui-collapsible ui-collapsible-inset ui-corner-all ui-collapsible-themed-content ui-collapsible-collapsed">'
+	//	item += '<h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed"><a href="#" class="ui-collapsible-heading-toggle ui-btn ui-fullsize ui-btn-icon-left ui-btn-up-b" data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-icon="plus" data-iconpos="left" data-theme="b" data-mini="false"><span class="ui-btn-inner"><span class="ui-btn-text">'+ this.name + '<span class="ui-collapsible-heading-status"> click to expand contents</span></span><span class="ui-icon ui-icon-plus ui-icon-shadow">&nbsp;</span></span></a></h4><div class="ui-collapsible-content ui-body-d ui-collapsible-content-collapsed" aria-hidden="true">'
+    //	item += '<p>' + getFilmInfo(this) + '</p>'
+	//	item += '</div></div>'
+		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
+		item.append($('<h4>'+this.name+'</h4>'))
+		item.append($('<p>' + getFilmInfo(this) + '</p>'))
 		$('#film-items').append(item);
+
+		$('#film-items').find('div[data-role=collapsible]').collapsible();  
 	})
-	$('#film-items').listview('refresh');
+//	$('#film-items').content('refresh');
 }
 
-/*function showProgramItemDetail(ProgramItem){
-	
-	$('#film-detail').html('text');
-//	$('<div id="content-title" align="center"></div>').html('<h3>'+curPI.name+'</h3>').appendTo('#film-detail');
-	$.each(ProgramItem.films,function(){
-		var item = '<li>' + this.name + '</li>';
-		console.log(getFilmInfo(this));
-		$('#film-detail').html(item);
-		$('#film-items').append(item);
-	})
-	$('#film-items').listview('refresh');
-}*/
-
+function displaySelectedFilmInfo(fi){
+	$('#film-details').html(getFilmInfo(fi));
+}
 
 function compare(a,b) {
   if (a.name < b.name)
@@ -188,18 +184,27 @@ function compare(a,b) {
 }
 
 function getFilmInfo(fi){
-	var info = "Film Title: " + fi.name + '\n';
-	info += "Duration: " + fi.dura + '\n';
-	info += "Description: " + fi.descript + '\n';
-	info += "Link: " + fi.infoLink + '\n';
-	info += "Image: " + fi.imgLink + '\n';
+	var info = "<b>Film Title</b>: "  + fi.name + '<br>';
+	info += "<b>Duration</b>: " + fi.dura + '<br>';
+	info += "<b>Description</b>: " + fi.descript + '<br>';
+	info += "<b>Link</b>: " + fi.infoLink + '<br>';
+	info += "<b>Image</b>: " + fi.imgLink + '<br>';
 	info += getFilmProperties(fi);
+	info += getSchedule(fi)
 	return info;
 }
 
 function getProgramItemInfo(pi){
-	var info = "Name: " + pi.name + '\n';
+	var info = "Name: " + pi.name + '<br>';
 	info += "Description: " + pi.descript;
+	return info;
+}
+
+function getSchedule(fi){
+	var info = ''
+	$.each(fi.schedules,function(){
+		info += this.id + '<br>'
+	})
 	return info;
 }
 
@@ -223,7 +228,7 @@ function goBack() {
 
 
 function getSingleInfo(prop,pNmae){
-	if(prop.length > 0) return pNmae + prop.substring(0,prop.length-2) + '\n';
+	if(prop.length > 0) return '<b>' + pNmae +'</b>'+ prop.substring(0,prop.length-2) + '<br>';
 	else return '';
 }
 
