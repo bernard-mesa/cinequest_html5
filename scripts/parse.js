@@ -1,14 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Cinequest</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/> 
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />			
-<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
-<script>
 var cnt = 0
 var ProgramItemArray = [];
 var FilmArray = [];
@@ -27,9 +16,7 @@ var SPGroupContainer = {
 }
 var SPGroup = [];
 var VenueArray = [];
-$(document).ready(function () {
-
-	
+function getFilm() {
     $.ajax({
         type: "GET",
         url: "newcinequest.xml",
@@ -134,17 +121,48 @@ $(document).ready(function () {
 			$.each(SPGroupContainer.keys,function(){
 				ProgramItemArray.push(SPGroupContainer.get(this));
 			})
-			console.log(ProgramItemArray.length)
-			printFilmItem(ProgramItemArray);
+		ProgramItemArray.sort(compare);
+		populateFilmList(ProgramItemArray);
         }   
     }); 
-});
+}
 
 // print name of FilmArray or ProgramItemArry
 function printFilmItem(col){
-	$.each(col,function(){
-		console.log(this.name);
+	$.each(SPGroupContainer.keys,function(){
+
 	})
+}
+
+
+function populateFilmList(ProgramItemArray){
+	$.each(ProgramItemArray,function(){
+		var item = $('<li><a href="film_detail.html"/><input type="checkbox" name="checkbox-'+this.id+'" id="checkbox-'+this.id+'" class="custom"/>' + this.name+ '</li>');
+		$('#films').append(item);
+	})
+	$('#films').listview('refresh');
+}
+
+/*function showProgramItemDetail(ProgramItem){
+	
+	$('#film-detail').html('text');
+//	$('<div id="content-title" align="center"></div>').html('<h3>'+curPI.name+'</h3>').appendTo('#film-detail');
+	$.each(ProgramItem.films,function(){
+		var item = '<li>' + this.name + '</li>';
+		console.log(getFilmInfo(this));
+		$('#film-detail').html(item);
+		$('#film-items').append(item);
+	})
+	$('#film-items').listview('refresh');
+}*/
+
+
+function compare(a,b) {
+  if (a.name < b.name)
+     return -1;
+  if (a.name > b.name)
+    return 1;
+  return 0;
 }
 
 function getFilmInfo(fi){
@@ -152,7 +170,8 @@ function getFilmInfo(fi){
 	info += "Duration: " + fi.dura + '\n';
 	info += "Description: " + fi.descript + '\n';
 	info += "Link: " + fi.infoLink + '\n';
-	info += "Image: " + fi.imgLink;
+	info += "Image: " + fi.imgLink + '\n';
+	info += getFilmProperties(fi);
 	return info;
 }
 
@@ -176,16 +195,21 @@ function getFilmProperties(fi){
 	return info;
 }
 
+function goBack() {
+    history.go(-1);
+}
+
+
 function getSingleInfo(prop,pNmae){
 	if(prop.length > 0) return pNmae + prop.substring(0,prop.length-2) + '\n';
 	else return '';
 }
 
-</script>
-</head>
-<body>
-<p id="someElement"></p>
-<p id="anotherElement"></p>
 
-</body>
-</html>
+
+
+//if(typeof clicked_source == 'undefined')
+//	$(extract_films_by_date);
+//else if(clicked_source == 'title') {
+//       $(extract_films_by_title);
+$(getFilm);

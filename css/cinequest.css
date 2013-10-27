@@ -1,0 +1,95 @@
+.view-screen {
+    width:560px;
+}
+
+#logo {
+    font-size:16pt;
+    font-family: sans-serif;
+    color:red;
+    f
+}
+
+#side-menu {
+    width: 2in;
+    font-size:10pt;
+    float:left
+}
+
+#films {
+    height: 4.5in;
+}
+
+.film {
+    margin:0;
+    padding: 0;
+    width:100%;
+    border-bottom-width: 1px;
+    border-bottom-style:solid;
+    border-bottom-color:gray;
+}
+
+.checkbox {
+        position: relative;
+        height: 30px;
+        width: 30px;
+        left: 0px;
+        top: 0px;
+}
+
+.forum_name {
+    position: absolute;
+    top: 0px;
+    left: 40px;
+    width: 520px;
+}
+
+a {
+    text-decoration:none;
+    color:black;
+}
+
+a:hover {
+    color:grey;
+}
+
+#festival_btn {
+    width:10%;
+    height:70%;
+    font-size:17px;
+}
+
+#dvds_btn {
+    width:10%;
+    height:70%;
+    font-size:17px;
+}
+
+#index_header {
+    height:50px;
+}
+
+#date_header {
+    height:35px;
+    text-align:left;
+    font-size:15px;
+    font-style:bold;
+    line-height:2em;
+}
+
+#films_date_title_btns {
+    font-size:0.8em;
+}
+
+#film-list-content {
+    height:640px;
+}
+
+.ui-dialog .ui-header {
+        max-width: 500px; 
+        margin: 10% auto 15px auto;
+}
+
+.ui-dialog .ui-footer {
+        max-width: 500px; 
+        margin: 10% auto 15px auto;
+}
