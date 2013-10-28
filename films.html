@@ -14,7 +14,7 @@
 <body>
 <div data-role="page" id="filmspage">
   <header data-role="header" data-position="fixed">
-  
+
   </header>
   <div data-role="content">
     <div data-role="header" id="date_header" data-theme="b"></div>
@@ -32,7 +32,7 @@
 <link rel="stylesheet" href="css/cinequest.css" />
 <script src="scripts/jquery.dateFormat-1.0.js" type="text/javascript"></script>
 <script src="scripts/headerbar.js" type="text/javascript"></script>
-<script src="scripts/parse.js"></script>
+<script src="scripts/getfilm.js"></script>
 <script>
 /*$("#film-list-content").bind("scrollstop", function(event) {
 var pos = $("#film-list-content").scrollTop();
@@ -53,21 +53,21 @@ $("#date_header").html("&nbsp;&nbsp;&nbsp;"+$(liel).attr("title"));
 <div data-role="page" id="detailspage">
 
   <header data-role="header" data-position="fixed">
-</header>
-<div data-role="content" id="cont">
-  <div style="font-size: 0.8em;">
-    <a href="#" data-role="button" onClick="goBack()" data-inline="true" data-icon="arrow-l">Films</a>
-  </div>
-  <br>
-  <b>Choose film to view details</b>
-  <br>
-  <div data-role="content" id="film-items">
-      
-  </div>
-  <div data-role="content" id="film-details">
+  </header>
+  <div data-role="content" id="cont">
+    <div style="font-size: 0.8em;">
+      <a href="#" data-role="button" onClick="goBack()" data-inline="true" data-icon="arrow-l">Films</a>
+    </div>
+    <br>
+    <b>Choose film to view details</b>
+    <br>
+    <div data-role="content" id="film-items">
+        
+    </div>
+    <div data-role="content" id="film-details">
 
+    </div>
   </div>
-</div>
 <link rel="stylesheet" href="css/cinequest.css" />
 <script src="scripts/jquery.dateFormat-1.0.js" type="text/javascript"></script>
 <script src="scripts/headerbar.js" type="text/javascript"></script>
