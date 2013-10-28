@@ -1,6 +1,7 @@
 var cnt = 0
 var ProgramItemArray = [];
 var FilmArray = [];
+var ForumItemArray = [];
 var SPGroupContainer = {
     hash: [],
     keys: [],
@@ -83,7 +84,8 @@ function getFilm() {
 						pi.films.push(fi);
 					}
 					if(pi.name.indexOf("Shorts Program")!=0){
-						ProgramItemArray.push(pi);
+						if(pi.name.indexOf("Forum") >= 0) ForumItemArray.push(pi);
+						else ProgramItemArray.push(pi);
 					}else{
 						SPGroupContainer.put(pi.name.substring(0,16),pi)
 					}
@@ -121,8 +123,10 @@ function getFilm() {
 			$.each(SPGroupContainer.keys,function(){
 				ProgramItemArray.push(SPGroupContainer.get(this));
 			})
-		ProgramItemArray.sort(compare);
-		populateFilmList(ProgramItemArray);
+		if(showstyle='title'){
+			ProgramItemArray.sort(compareByName);
+			populateFilmList(ProgramItemArray);
+		}
         }   
     }); 
 }
@@ -136,12 +140,11 @@ function printFilmItem(col){
 
 
 function populateFilmList(ProgramItemArray){
+	$('#films').empty()
 	$.each(ProgramItemArray,function(){
-	//	var item = $('<li>' + this.name+ '</li>');
-		//<a href="film_detail.html"/><input type="checkbox" name="checkbox-'+this.id+'" id="checkbox-'+this.id+'" class="custom"/>
 		var item = $('<li/>');
 		var link = $('<a/>').html(this.name);
-		link.click(createLinkHandler(movetopage,this));
+		link.click(createLinkHandler(moveToFilmDetails,this));
 		item.append(link)
 		$('#films').append(item);
 	})
@@ -152,15 +155,12 @@ function createLinkHandler(f,i){
 	return function(){f(i);};
 }
 
-function movetopage(ProgramItem){
+
+function moveToFilmDetails(ProgramItem){
 	$.mobile.changePage('#detailspage');
 	$('#film-items').empty();
 	$('#film-details').html('');
 	$.each(ProgramItem.films,function(){
-	//	var item ='<div data-role="collapsible" data-theme="b" data-content-theme="d" class="ui-collapsible ui-collapsible-inset ui-corner-all ui-collapsible-themed-content ui-collapsible-collapsed">'
-	//	item += '<h4 class="ui-collapsible-heading ui-collapsible-heading-collapsed"><a href="#" class="ui-collapsible-heading-toggle ui-btn ui-fullsize ui-btn-icon-left ui-btn-up-b" data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="span" data-icon="plus" data-iconpos="left" data-theme="b" data-mini="false"><span class="ui-btn-inner"><span class="ui-btn-text">'+ this.name + '<span class="ui-collapsible-heading-status"> click to expand contents</span></span><span class="ui-icon ui-icon-plus ui-icon-shadow">&nbsp;</span></span></a></h4><div class="ui-collapsible-content ui-body-d ui-collapsible-content-collapsed" aria-hidden="true">'
-    //	item += '<p>' + getFilmInfo(this) + '</p>'
-	//	item += '</div></div>'
 		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
 		item.append($('<h4>'+this.name+'</h4>'))
 		item.append($('<p>' + getFilmInfo(this) + '</p>'))
@@ -168,14 +168,13 @@ function movetopage(ProgramItem){
 
 		$('#film-items').find('div[data-role=collapsible]').collapsible();  
 	})
-//	$('#film-items').content('refresh');
 }
 
 function displaySelectedFilmInfo(fi){
 	$('#film-details').html(getFilmInfo(fi));
 }
 
-function compare(a,b) {
+function compareByName(a,b) {
   if (a.name < b.name)
      return -1;
   if (a.name > b.name)
@@ -185,8 +184,8 @@ function compare(a,b) {
 
 function getFilmInfo(fi){
 	var info = '<img src="'+ fi.imgLink +'"/> <br>';
-	info += '<a href="' + fi.infoLink + '">Link to Movie</a><br>'
-	info += "<b>Film Title</b>: "  + fi.name + '<br>';
+	info += '<a href="' + fi.infoLink + '">Link</a><br>'
+	info += "<b>Title</b>: "  + fi.name + '<br>';
 	info += "<b>Duration</b>: " + fi.dura + '<br>';
 	info += "<b>Description</b>: " + fi.descript + '<br>';
 	info += getFilmProperties(fi);
@@ -194,11 +193,6 @@ function getFilmInfo(fi){
 	return info;
 }
 
-function getProgramItemInfo(pi){
-	var info = "Name: " + pi.name + '<br>';
-	info += "Description: " + pi.descript;
-	return info;
-}
 
 function getSchedule(fi){
 	var info = ''
@@ -222,13 +216,14 @@ function getFilmProperties(fi){
 	return info;
 }
 
+
 function goBack() {
     history.go(-1);
 }
 
 
-function getSingleInfo(prop,pNmae){
-	if(prop.length > 0) return '<b>' + pNmae +'</b>'+ prop.substring(0,prop.length-2) + '<br>';
+function getSingleInfo(prop,pName){
+	if(prop.length > 0) return '<b>' + pName +'</b>'+ prop.substring(0,prop.length-2) + '<br>';
 	else return '';
 }
 
@@ -243,4 +238,11 @@ function getSingleInfo(prop,pNmae){
 //	$(extract_films_by_date);
 //else if(clicked_source == 'title') {
 //       $(extract_films_by_title);
+
+function setShowStyle(newstyle){
+	showstyle = newstyle
+}
+var showstyle = 'title'
+$('#title-btn').click(createLinkHandler(setShowStyle,'title'));
+$('#date-btn').click(createLinkHandler(setShowStyle,'date'));
 $(getFilm);
