@@ -1,7 +1,7 @@
 var cnt = 0
 var ProgramItemArray = [];
+var DateItemArray = [];
 var FilmArray = [];
-var ForumItemArray = [];
 var SPGroupContainer = {
     hash: [],
     keys: [],
@@ -37,6 +37,7 @@ function getFilm() {
 				fi.cinematographer = '';
 				fi.country = '';
 				fi.languages = '';
+				fi.events = '';
 				pi.films = [];
                 pi.id = $(this).find('ID')[0].textContent;
                 fi.id = pi.id;
@@ -63,13 +64,14 @@ function getFilm() {
 					if(key == 'Producer') fi.producer += value + ', ';
 					if(key == 'Country') fi.country += value + ', ';
 					if(key == 'Language') fi.languages += value + ', '; 
+					if(key == 'Events') fi.events += value + ', '; 
 				});
 				$currentShowings = $(this).find('CurrentShowings').find('Showing');
 				$currentShowings.each(function(){
 					var show = new Object();
 					show.id = $(this).find('ID').text();
-					show.start = $(this).find('StartDate').text();
-					show.end = $(this).find('EndDate').text();
+					show.startD = $(this).find('StartDate').text();
+					show.endD = $(this).find('EndDate').text();
 					show.duration = $(this).find('Duration').text();
 					$venue = $(this).find('Venue');
 					show.venue = new Object();
@@ -84,8 +86,16 @@ function getFilm() {
 						pi.films.push(fi);
 					}
 					if(pi.name.indexOf("Shorts Program")!=0){
-						if(pi.name.indexOf("Forum") >= 0) ForumItemArray.push(pi);
-						else ProgramItemArray.push(pi);
+						if(pi.name.indexOf("Forum") < 0 && fi.events.length == 0){
+							$.each(fi.schedules,function(){
+								var dt = new Object();
+								dt.dates = this.startD;
+								dt.ends = this.endD;
+								dt.pi = pi;
+								DateItemArray.push(dt);
+							})
+							ProgramItemArray.push(pi);
+						}
 					}else{
 						SPGroupContainer.put(pi.name.substring(0,16),pi)
 					}
@@ -123,23 +133,19 @@ function getFilm() {
 			$.each(SPGroupContainer.keys,function(){
 				ProgramItemArray.push(SPGroupContainer.get(this));
 			})
-		if(showstyle='title'){
-			ProgramItemArray.sort(compareByName);
-			populateFilmList(ProgramItemArray);
-		}
+		
+			
+			populateFilmListByName(ProgramItemArray);
+		
         }   
     }); 
 }
 
-// print name of FilmArray or ProgramItemArry
-function printFilmItem(col){
-	$.each(SPGroupContainer.keys,function(){
-
-	})
-}
 
 
-function populateFilmList(ProgramItemArray){
+
+function populateFilmListByName(ProgramItemArray){
+	ProgramItemArray.sort(compareByName);
 	$('#films').empty()
 	$.each(ProgramItemArray,function(){
 		var item = $('<li/>');
@@ -150,6 +156,28 @@ function populateFilmList(ProgramItemArray){
 	})
 	$('#films').listview('refresh');
 }
+
+function populateFilmListByDate(DateItemArray){
+	DateItemArray.sort(compareByDate);
+	$('#films').empty()
+	$.each(DateItemArray,function(){
+		var curDate = $.format.date(this.dates, 'ddd, MMMM d')
+		prevDate = curDate; 
+		var toDisplay = '('+ $.format.date(this.dates, 'hh:mm a') +'-'+ $.format.date(this.ends, 'hh:mm a') + ')   ' + this.pi.name;
+		var item = $('<li title="'+curDate+'"/>');
+		var link = $('<a/>').html(toDisplay);
+		link.click(createLinkHandler(moveToFilmDetails,this.pi));
+		item.append(link)
+		$('#films').append(item);
+	})
+	$('#films').listview({
+            autodividersSelector: function (li) {
+                var out = li.attr('title');
+                return out;
+            }
+        }).listview('refresh');
+}
+
 
 function createLinkHandler(f,i){
 	return function(){f(i);};
@@ -181,6 +209,29 @@ function compareByName(a,b) {
     return 1;
   return 0;
 }
+
+function compareByDate(a,b){
+	if(getDateVal(a) < getDateVal(b))
+		return -1;
+	else if(getDateVal(a) > getDateVal(b))
+		return 1;
+	else{
+		if(getTimeVal(a) < getTimeVal(b))
+			return -1;
+		else if (getTimeVal(a) > getTimeVal(b))
+			return 1;
+		else return 0;
+	}
+}
+
+function getDateVal(dateitem){
+	return parseInt(dateitem.dates.substring(0,4),10)*10000 + parseInt(dateitem.dates.substring(5,7),10)*100 +parseInt(dateitem.dates.substring(8,10),10)
+}
+
+function getTimeVal(dateitem){
+	return parseInt(dateitem.dates.substring(11,13),10)*10000 + parseInt(dateitem.dates.substring(14,16),10)*100 +parseInt(dateitem.dates.substring(17,19),10)
+}
+
 
 function getFilmInfo(fi){
 	var info = '<img src="'+ fi.imgLink +'"/> <br>';
@@ -243,6 +294,6 @@ function setShowStyle(newstyle){
 	showstyle = newstyle
 }
 var showstyle = 'title'
-$('#title-btn').click(createLinkHandler(setShowStyle,'title'));
-$('#date-btn').click(createLinkHandler(setShowStyle,'date'));
+$('#title-btn').click(createLinkHandler(populateFilmListByName,ProgramItemArray));
+$('#date-btn').click(createLinkHandler(populateFilmListByDate,DateItemArray));
 $(getFilm);

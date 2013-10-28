@@ -20,35 +20,35 @@ shortMonthsToNumber["Dec"] = "12";
 
     jQuery.format = (function () {
         function strDay(value) {
-  return daysInWeek[parseInt(value, 10)] || value;
+            return daysInWeek[parseInt(value, 10)] || value;
         }
 
         function strMonth(value) {
-var monthArrayIndex = parseInt(value, 10) - 1;
-  return shortMonthsInYear[monthArrayIndex] || value;
+            var monthArrayIndex = parseInt(value, 10) - 1;
+            return shortMonthsInYear[monthArrayIndex] || value;
         }
 
         function strLongMonth(value) {
-var monthArrayIndex = parseInt(value, 10) - 1;
-return longMonthsInYear[monthArrayIndex] || value;
+            var monthArrayIndex = parseInt(value, 10) - 1;
+            return longMonthsInYear[monthArrayIndex] || value;
         }
 
         var parseMonth = function (value) {
-return shortMonthsToNumber[value] || value;
+            return shortMonthsToNumber[value] || value;
         };
 
         var parseTime = function (value) {
                 var retValue = value;
+
                 var millis = "";
                 if (retValue.indexOf(".") !== -1) {
                     var delimited = retValue.split('.');
                     retValue = delimited[0];
                     millis = delimited[1];
                 }
-
                 var values3 = retValue.split(":");
 
-                if (values3.length === 3) {
+                if (values3.length == 3) {
                     hour = values3[0];
                     minute = values3[1];
                     second = values3[2];
@@ -101,7 +101,7 @@ return this.date(new Date(value), format);
                         date = new Date(year, month - 1, dayOfMonth);
                         dayOfWeek = date.getDay();
                     } else {
-                        var values = value.split(" ");
+                        var values = value.split("T");
                         switch (values.length) {
                         case 6:
                             /* Wed Jan 13 10:43:41 CET 2010 */
@@ -224,26 +224,31 @@ Thanks jakemonO
                             pattern = "";
                             break;
                         case "HH":
+                        //    console.log(time.hour)
                             retValue += time.hour;
                             pattern = "";
                             break;
                         case "hh":
                             /* time.hour is "00" as string == is used instead of === */
-                            var hour = (time.hour == 0 ? 12 : time.hour < 13 ? time.hour : time.hour - 12);
+                            
+                            var hour = (time.hour == 0 ? 12 : time.hour);
+                            hour = (hour < 13) ? hour : (hour - 12);
                             hour = String(hour).length == 1 ? '0' + hour : hour;
                             retValue += hour;
+                            pattern = ""; 
+                            break;
+                        case "h":
+                            if (format.charAt(i + 1) == "h") {
+                            break;
+                            }
+                            var hour = (time.hour == 0 ? 12 : time.hour);
+                            hour = (hour < 13) ? hour : hour - 12;
+                            hour = time.hour;
+                            retValue += parseInt(hour, 10);
+                            // Fixing issue https://github.com/phstc/jquery-dateFormat/issues/21
+                            // retValue = parseInt(retValue, 10);
                             pattern = "";
                             break;
-case "h":
-if (format.charAt(i + 1) == "h") {
-break;
-}
-var hour = (time.hour == 0 ? 12 : time.hour < 13 ? time.hour : time.hour - 12);
-retValue += parseInt(hour, 10);
-// Fixing issue https://github.com/phstc/jquery-dateFormat/issues/21
-// retValue = parseInt(retValue, 10);
-pattern = "";
-break;
                         case "mm":
                             retValue += time.minute;
                             pattern = "";
