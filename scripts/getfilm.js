@@ -148,13 +148,18 @@ function populateFilmListByName(ProgramItemArray){
 	ProgramItemArray.sort(compareByName);
 	$('#films').empty()
 	$.each(ProgramItemArray,function(){
-		var item = $('<li/>');
+		var item = $('<li title="'+this.name+'"/>');
 		var link = $('<a/>').html(this.name);
 		link.click(createLinkHandler(moveToFilmDetails,this));
 		item.append(link)
 		$('#films').append(item);
 	})
-	$('#films').listview('refresh');
+	$('#films').listview({
+            autodividersSelector: function (li) {
+                var out = li.attr('title').charAt(0);
+                return out;
+            }
+        }).listview('refresh');
 }
 
 function populateFilmListByDate(DateItemArray){
@@ -189,6 +194,7 @@ function moveToFilmDetails(ProgramItem){
 	$('#film-items').empty();
 	$('#film-details').html('');
 	$.each(ProgramItem.films,function(){
+		getSchedule(this)
 		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
 		item.append($('<h4>'+this.name+'</h4>'))
 		item.append($('<p>' + getFilmInfo(this) + '</p>'))
@@ -240,17 +246,57 @@ function getFilmInfo(fi){
 	info += "<b>Duration</b>: " + fi.dura + '<br>';
 	info += "<b>Description</b>: " + fi.descript + '<br>';
 	info += getFilmProperties(fi);
-	info += getSchedule(fi)
 	return info;
 }
 
 
 function getSchedule(fi){
+	$('#film-sched').empty()
 	var info = ''
 	$.each(fi.schedules,function(){
-		info += this.id + '<br>'
+		var venue = this.venue.name
+		var dates = $.format.date(this.startD, 'ddd, MMMM d')
+		var sTime = $.format.date(this.startD, 'hh:mm a')
+		var eTime = $.format.date(this.endD, 'hh:mm a')
+		var item = $('<fieldset data-role="controlgroup"><input type="checkbox" name="checkbox-'+this.id+'" title="'+dates+'" id="checkbox-'+this.id+'" class="custom"/>'+dates + ', '+ sTime + ' - ' + eTime +'<br>')
+		/*var checkedAttribute = false;
+            if (localStorage) {
+                value = localStorage.getItem(this.id);
+                    if (value)
+                        checkedAttribute = true;
+            }*/
+		$('#film-sched').append(item)
+	//	$('#checkbox-'+this.id).attr('checked',checkedAttribute)
+		// do some checkbox logics
+		$('#checkbox-'+this.id).change(function() {
+				//	console.log(localStorage)
+
+					var store = new localstore();
+                    var isChecked = $(this).is(':checked');
+                    var checkbox_id = ($(this).attr('id')).split('-');
+                    var schedule_id = checkbox_id[1];
+                    if (isChecked) {                   
+                       date = $(this).attr('title');
+
+                       if (!store.check_key(schedule_id)) {
+                       		 
+                             value = localStorage.getItem(schedule_id);
+                        //    if (value){
+                                 store.add(schedule_id, date);
+                         //    }
+                         //    else
+                         //        localStorage[schedule_id] = date; 
+                       }
+                     } else {
+                         if (localStorage) {
+                        // 	value = store.getvalue(schedule_id);
+                        // 	if(value)
+                            store.remove(schedule_id);
+                         }
+                     }
+                  });
+		// checkbox function here
 	})
-	return info;
 }
 
 // get film properties
@@ -278,18 +324,6 @@ function getSingleInfo(prop,pName){
 	else return '';
 }
 
-
-//$('.list-content').click(function(){
-//	$.mobile.changePage('#detailspage')
-//	$('#film-details').html('yoyo');
-//});
-
-
-//if(typeof clicked_source == 'undefined')
-//	$(extract_films_by_date);
-//else if(clicked_source == 'title') {
-//       $(extract_films_by_title);
-
 function setShowStyle(newstyle){
 	showstyle = newstyle
 }
@@ -297,3 +331,4 @@ var showstyle = 'title'
 $('#title-btn').click(createLinkHandler(populateFilmListByName,ProgramItemArray));
 $('#date-btn').click(createLinkHandler(populateFilmListByDate,DateItemArray));
 $(getFilm);
+localStorage.clear()

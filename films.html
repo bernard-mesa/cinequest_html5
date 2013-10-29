@@ -32,6 +32,7 @@
 <link rel="stylesheet" href="css/cinequest.css" />
 <script src="scripts/jquery.dateFormat-1.0.js" type="text/javascript"></script>
 <script src="scripts/headerbar.js" type="text/javascript"></script>
+<script src="scripts/localstorage.js"></script>
 <script src="scripts/getfilm.js"></script>
 <script>
 /*$("#film-list-content").bind("scrollstop", function(event) {
@@ -57,6 +58,10 @@ $("#date_header").html("&nbsp;&nbsp;&nbsp;"+$(liel).attr("title"));
   <div data-role="content" id="cont">
     <div style="font-size: 0.8em;">
       <a href="#" data-role="button" onClick="goBack()" data-inline="true" data-icon="arrow-l">Films</a>
+    </div>
+    <b>Schedules</b>
+    <div data-role="content" id="film-sched">
+        
     </div>
     <br>
     <b>Choose film to view details</b>
