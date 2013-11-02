@@ -90,7 +90,7 @@ function getFilm() {
 					$venue = $(this).find('Venue');
 					show.venue = new Object();
 					show.venue.id = $venue.find('VenueID').text();
-					show.venue.name = $venue.find('VenueName').text();
+					show.venue.name = $venue.find('VenueName').text().replace(/[^A-Z0-9]/g, '');
 					show.venue.address = $venue.find('VenueAddress1').text();
 					fi.schedules.push(show);
 				});
@@ -107,7 +107,7 @@ function getFilm() {
 						dt.ends = this.endD;
 						dt.pi = pi;
 						dt.venue = this.venue;
-						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') at '+this.venue.name;
+						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ fi.name+'"';
 		
 						AllSchedules.put(this.id,dt);
 					})
@@ -222,9 +222,8 @@ function createLinkHandler(f,i){
 function moveToFilmDetails(ProgramItem){
 	$.mobile.changePage('#detailspage');
 	$('#film-items').empty();
-	$('#film-sched').empty()
+	$('#film-sched').empty();
 	$('#film-details').html('');
-	if(ProgramItem.name.indexOf('Shorts Program')>=0) console.log(ProgramItem.films[0].schedules)
 	$.each(ProgramItem.films,function(){
 		getSchedule(this)
 		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
@@ -331,9 +330,11 @@ function getSchedule(fi){
                      if (isChecked) { 
                      	AllSchedules.checked++;
                      	AllSchedules.get(schedule_id).isChosen = true;
+                    // 	localStorage.setItem(schedule_id,AllSchedules.get(schedule_id))
                      }else{
 						AllSchedules.checked--;
                      	AllSchedules.get(schedule_id).isChosen = false;
+                    // 	localStorage.removeItem(schedule_id)
                      }
 
                   });

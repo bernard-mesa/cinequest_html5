@@ -1,6 +1,19 @@
 var cnt = 0
 var EventItemArray = [];
-
+var AllSchedules = {
+    hash: [],
+    keys: [],
+    length: 0,
+    checked: 0,
+    get: function(key){
+    	return this.hash[key];
+    },
+    put: function(key, value){
+    	this.hash[key] = value;
+    	this.keys.push(key);
+    	this.length++;
+    }
+}
 var VenueArray = [];
 function getEvent() {
     $.ajax({
@@ -36,8 +49,8 @@ function getEvent() {
 				$currentShowings.each(function(){
 					var show = new Object();
 					show.id = $(this).find('ID').text();
-					show.start = $(this).find('StartDate').text();
-					show.end = $(this).find('EndDate').text();
+					show.startD = $(this).find('StartDate').text();
+					show.endD = $(this).find('EndDate').text();
 					show.duration = $(this).find('Duration').text();
 					$venue = $(this).find('Venue');
 					show.venue = new Object();
@@ -50,6 +63,18 @@ function getEvent() {
 				if (fi.events.length > 0){
 					pi.films.push(fi);
 					EventItemArray.push(pi);
+
+					$.each(fi.schedules,function(){
+						var dt = new Object();
+						dt.isChosen = false;
+						dt.dates = this.startD;
+						dt.ends = this.endD;
+						dt.pi = pi;
+						dt.venue = this.venue;
+						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ fi.name+'"';
+		
+						AllSchedules.put(this.id,dt);
+					})
 				}
 				
             });
@@ -83,9 +108,14 @@ function createLinkHandler(f,i){
 function moveToEventDetails(ProgramItem){
 	$.mobile.changePage('#eventdetailspage');
 	$('#event-details').empty();
-	var item = '<h4>'+ProgramItem.name+'</h4>'
-	item += '<p>' + getEventInfo(ProgramItem.films[0]) + '</p>'
-	$('#event-details').append(item);
+	$('#event-sched').empty();
+	$.each(ProgramItem.films,function(){
+		getSchedule(this)
+
+		var item = '<h4>'+ProgramItem.name+'</h4>'
+		item += '<p>' + getEventInfo(this) + '</p>'
+		$('#event-details').append(item);
+	})
 }
 
 
@@ -97,7 +127,6 @@ function getEventInfo(fi){
 	info += "<b>Duration</b>: " + fi.dura + '<br>';
 	info += "<b>Description</b>: " + fi.descript + '<br>';
 	info += '<b>Event Type</b>: '+ fi.events.substring(0,fi.events.length-2) + '<br>'
-	info += getSchedule(fi)
 	return info;
 }
 
@@ -110,11 +139,38 @@ function compareByName(a,b) {
 }
 
 function getSchedule(fi){
-	var info = ''
+	var info = fi.name
 	$.each(fi.schedules,function(){
-		info += this.id + '<br>'
+		var venue = this.venue.name
+		var keyDate = this.startD
+		var dates = $.format.date(this.startD, 'ddd, MMMM d')
+		var sTime = $.format.date(this.startD, 'hh:mm a')
+		var eTime = $.format.date(this.endD, 'hh:mm a')
+		var item = $('<fieldset data-role="controlgroup"><input type="checkbox" name="checkbox-'+this.id+'" title="'+dates+'" id="checkbox-'+this.id+'" class="custom"/>'+dates + ', '+ sTime + ' - ' + eTime +'<br>')
+		
+		$('#event-sched').append(item)
+		var checkedAttribute = false;
+            if (AllSchedules.get(this.id).isChosen) {
+                checkedAttribute = true;
+             }
+        $('#checkbox-'+this.id).attr('checked', checkedAttribute);
+		$('#checkbox-'+this.id).change(function() {
+				
+                    var isChecked = $(this).is(':checked');
+                    var checkbox_id = ($(this).attr('id')).split('-');
+                    var schedule_id = checkbox_id[1];
+                    
+                     if (isChecked) { 
+                     	AllSchedules.checked++;
+                     	AllSchedules.get(schedule_id).isChosen = true;
+                     }else{
+						AllSchedules.checked--;
+                     	AllSchedules.get(schedule_id).isChosen = false;
+                     }
+
+                  });
+		// checkbox function here
 	})
-	return info;
 }
 
 function goBack() {

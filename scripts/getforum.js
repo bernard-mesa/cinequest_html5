@@ -1,6 +1,19 @@
 var cnt = 0
 var ForumItemArray = [];
-
+var AllSchedules = {
+    hash: [],
+    keys: [],
+    length: 0,
+    checked: 0,
+    get: function(key){
+    	return this.hash[key];
+    },
+    put: function(key, value){
+    	this.hash[key] = value;
+    	this.keys.push(key);
+    	this.length++;
+    }
+}
 var VenueArray = [];
 function getForum() {
     $.ajax({
@@ -30,8 +43,8 @@ function getForum() {
 				$currentShowings.each(function(){
 					var show = new Object();
 					show.id = $(this).find('ID').text();
-					show.start = $(this).find('StartDate').text();
-					show.end = $(this).find('EndDate').text();
+					show.startD = $(this).find('StartDate').text();
+					show.endD = $(this).find('EndDate').text();
 					show.duration = $(this).find('Duration').text();
 					$venue = $(this).find('Venue');
 					show.venue = new Object();
@@ -49,6 +62,17 @@ function getForum() {
 						if(pi.name.indexOf("Forum") >= 0) ForumItemArray.push(pi);
 						
 					}
+					$.each(fi.schedules,function(){
+						var dt = new Object();
+						dt.isChosen = false;
+						dt.dates = this.startD;
+						dt.ends = this.endD;
+						dt.pi = pi;
+						dt.venue = this.venue;
+						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ fi.name+'"';
+		
+						AllSchedules.put(this.id,dt);
+					})
 				}
 				
             });
@@ -90,9 +114,13 @@ function createLinkHandler(f,i){
 function moveToForumDetails(ProgramItem){
 	$.mobile.changePage('#forumdetailspage');
 	$('#forum-details').empty();
-	var item = '<h4>'+ProgramItem.name+'</h4>'
-	item += '<p>' + getForumInfo(ProgramItem.films[0]) + '</p>'
-	$('#forum-details').append(item);
+	$('#event-sched').empty();
+	$.each(ProgramItem.films,function(){
+		getSchedule(this)
+		var item = '<h4>'+ProgramItem.name+'</h4>'
+		item += '<p>' + getForumInfo(this) + '</p>'
+		$('#forum-details').append(item);
+	})
 }
 
 
@@ -103,17 +131,43 @@ function getForumInfo(fi){
 	info += "<b>Title</b>: "  + fi.name + '<br>';
 	info += "<b>Duration</b>: " + fi.dura + '<br>';
 	info += "<b>Description</b>: " + fi.descript + '<br>';
-	info += getSchedule(fi)
 	return info;
 }
 
 
 function getSchedule(fi){
-	var info = ''
+	var info = fi.name
 	$.each(fi.schedules,function(){
-		info += this.id + '<br>'
+		var venue = this.venue.name
+		var keyDate = this.startD
+		var dates = $.format.date(this.startD, 'ddd, MMMM d')
+		var sTime = $.format.date(this.startD, 'hh:mm a')
+		var eTime = $.format.date(this.endD, 'hh:mm a')
+		var item = $('<fieldset data-role="controlgroup"><input type="checkbox" name="checkbox-'+this.id+'" title="'+dates+'" id="checkbox-'+this.id+'" class="custom"/>'+dates + ', '+ sTime + ' - ' + eTime +'<br>')
+		
+		$('#forum-sched').append(item)
+		var checkedAttribute = false;
+            if (AllSchedules.get(this.id).isChosen) {
+                checkedAttribute = true;
+             }
+        $('#checkbox-'+this.id).attr('checked', checkedAttribute);
+		$('#checkbox-'+this.id).change(function() {
+				
+                    var isChecked = $(this).is(':checked');
+                    var checkbox_id = ($(this).attr('id')).split('-');
+                    var schedule_id = checkbox_id[1];
+                    
+                     if (isChecked) { 
+                     	AllSchedules.checked++;
+                     	AllSchedules.get(schedule_id).isChosen = true;
+                     }else{
+						AllSchedules.checked--;
+                     	AllSchedules.get(schedule_id).isChosen = false;
+                     }
+
+                  });
+		// checkbox function here
 	})
-	return info;
 }
 
 function goBack() {

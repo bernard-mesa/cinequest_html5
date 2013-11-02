@@ -20,7 +20,7 @@ var chosenSched = [];
 }*/
 
 function loadcontents(){
-	console.log(AllSchedules)
+	console.log(localStorage)
 	if(AllSchedules.checked==0){
 		var message = "You do not have any schedule";
         $('<li></li>').html('<h3>'+message+'</h3>').appendTo('#schedule');
@@ -28,8 +28,9 @@ function loadcontents(){
 	else{
 	//	AllSchedules.sort(compareByDate)
 		$.each(AllSchedules.keys,function(){
-			if(AllSchedules.get(this).isChosen)
+			if(AllSchedules.get(this).isChosen){
 				chosenSched.push(AllSchedules.get(this))
+			}
 			
 		})
 		chosenSched.sort(compareByDate)
