@@ -39,7 +39,7 @@ function localstore(){
         }
 	
         this.get_allvalues=function(){
-                var arr;
+                var arr= new Array();
                 for(var key in localStorage){
                         val=localStorage.getItem(key);
                         arr.push(val);

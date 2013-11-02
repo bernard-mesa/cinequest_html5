@@ -2,6 +2,20 @@ var cnt = 0
 var ProgramItemArray = [];
 var DateItemArray = [];
 var FilmArray = [];
+var AllSchedules = {
+    hash: [],
+    keys: [],
+    length: 0,
+    checked: 0,
+    get: function(key){
+    	return this.hash[key];
+    },
+    put: function(key, value){
+    	this.hash[key] = value;
+    	this.keys.push(key);
+    	this.length++;
+    }
+}
 var SPGroupContainer = {
     hash: [],
     keys: [],
@@ -85,8 +99,20 @@ function getFilm() {
 					if (pi.descript.indexOf("Shorts Program") < 0){
 						pi.films.push(fi);
 					}
-					if(pi.name.indexOf("Shorts Program")!=0){
-						if(pi.name.indexOf("Forum") < 0 && fi.events.length == 0){
+
+					$.each(fi.schedules,function(){
+						var dt = new Object();
+						dt.isChosen = false;
+						dt.dates = this.startD;
+						dt.ends = this.endD;
+						dt.pi = pi;
+						dt.venue = this.venue;
+						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') at '+this.venue.name;
+		
+						AllSchedules.put(this.id,dt);
+					})
+
+					if(pi.name.indexOf("Forum") < 0 && fi.events.length == 0){
 							$.each(fi.schedules,function(){
 								var dt = new Object();
 								dt.dates = this.startD;
@@ -94,11 +120,14 @@ function getFilm() {
 								dt.pi = pi;
 								DateItemArray.push(dt);
 							})
-							ProgramItemArray.push(pi);
-						}
+						if(pi.name.indexOf("Shorts Program")!=0){
+						ProgramItemArray.push(pi);
 					}else{
 						SPGroupContainer.put(pi.name.substring(0,16),pi)
 					}
+					}
+
+					
 				}else{
 					if(pi.descript.indexOf("Part of Shorts Program")==0){
 						var key = pi.descript.substring(8,24);
@@ -132,6 +161,7 @@ function getFilm() {
 			
 			$.each(SPGroupContainer.keys,function(){
 				ProgramItemArray.push(SPGroupContainer.get(this));
+				
 			})
 		
 			
@@ -192,7 +222,9 @@ function createLinkHandler(f,i){
 function moveToFilmDetails(ProgramItem){
 	$.mobile.changePage('#detailspage');
 	$('#film-items').empty();
+	$('#film-sched').empty()
 	$('#film-details').html('');
+	if(ProgramItem.name.indexOf('Shorts Program')>=0) console.log(ProgramItem.films[0].schedules)
 	$.each(ProgramItem.films,function(){
 		getSchedule(this)
 		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
@@ -251,23 +283,21 @@ function getFilmInfo(fi){
 
 
 function getSchedule(fi){
-	$('#film-sched').empty()
-	var info = ''
+	var info = fi.name
 	$.each(fi.schedules,function(){
 		var venue = this.venue.name
+		var keyDate = this.startD
 		var dates = $.format.date(this.startD, 'ddd, MMMM d')
 		var sTime = $.format.date(this.startD, 'hh:mm a')
 		var eTime = $.format.date(this.endD, 'hh:mm a')
 		var item = $('<fieldset data-role="controlgroup"><input type="checkbox" name="checkbox-'+this.id+'" title="'+dates+'" id="checkbox-'+this.id+'" class="custom"/>'+dates + ', '+ sTime + ' - ' + eTime +'<br>')
-		/*var checkedAttribute = false;
-            if (localStorage) {
-                value = localStorage.getItem(this.id);
-                    if (value)
-                        checkedAttribute = true;
-            }*/
+		
 		$('#film-sched').append(item)
-	//	$('#checkbox-'+this.id).attr('checked',checkedAttribute)
-		// do some checkbox logics
+		var checkedAttribute = false;
+            if (AllSchedules.get(this.id).isChosen) {
+                checkedAttribute = true;
+             }
+        $('#checkbox-'+this.id).attr('checked', checkedAttribute);
 		$('#checkbox-'+this.id).change(function() {
 				//	console.log(localStorage)
 
@@ -275,25 +305,37 @@ function getSchedule(fi){
                     var isChecked = $(this).is(':checked');
                     var checkbox_id = ($(this).attr('id')).split('-');
                     var schedule_id = checkbox_id[1];
-                    if (isChecked) {                   
+                    /*if (isChecked) {                   
                        date = $(this).attr('title');
 
                        if (!store.check_key(schedule_id)) {
                        		 
                              value = localStorage.getItem(schedule_id);
                         //    if (value){
-                                 store.add(schedule_id, date);
+                        		 var sched_item = new Object();
+                        		 sched_item.keyDate = keyDate
+                        		 sched_item.value = date + '(' + sTime +' - '+eTime+'): '+info + ' ---' +venue
+                                 store.add(schedule_id, sched_item);
                          //    }
                          //    else
                          //        localStorage[schedule_id] = date; 
                        }
-                     } else {
+                     } 
+                     else {
                          if (localStorage) {
                         // 	value = store.getvalue(schedule_id);
                         // 	if(value)
                             store.remove(schedule_id);
                          }
+                     }*/
+                     if (isChecked) { 
+                     	AllSchedules.checked++;
+                     	AllSchedules.get(schedule_id).isChosen = true;
+                     }else{
+						AllSchedules.checked--;
+                     	AllSchedules.get(schedule_id).isChosen = false;
                      }
+
                   });
 		// checkbox function here
 	})
