@@ -148,7 +148,7 @@ function getSchedule(fi){
 		
 		$('#forum-sched').append(item)
 		var checkedAttribute = false;
-            if (AllSchedules.get(this.id).isChosen) {
+            if (localStorage.getItem(this.id)!=null) {
                 checkedAttribute = true;
              }
         $('#checkbox-'+this.id).attr('checked', checkedAttribute);
@@ -161,9 +161,11 @@ function getSchedule(fi){
                      if (isChecked) { 
                      	AllSchedules.checked++;
                      	AllSchedules.get(schedule_id).isChosen = true;
+                     	localStorage.setItem(schedule_id, AllSchedules.get(schedule_id).info)
                      }else{
 						AllSchedules.checked--;
                      	AllSchedules.get(schedule_id).isChosen = false;
+                     	localStorage.removeItem(schedule_id)
                      }
 
                   });
