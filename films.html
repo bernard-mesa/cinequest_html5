@@ -15,12 +15,13 @@
 <div data-role="page" id="filmspage">
   <header data-role="header" data-position="fixed">
 
+    <script src="scripts/getfilm.js"></script>
   </header>
   <div data-role="content">
     <div data-role="header" id="date_header" data-theme="b"></div>
     <div id="films_date_title_btns" data-role="controlgroup" data-type="horizontal">
-      <a href="#" id="title-btn" data-role="button">Title</a>
-      <a href="#" id="date-btn" data-role="button">Date</a>
+      <a href="#" id="title-btn" data-role="button" onclick="populateFilmListByName(ProgramItemArray)">Title</a>
+      <a href="#" id="date-btn" data-role="button" onclick="populateFilmListByDate(DateItemArray)">Date</a>
     </div>
     
     <div id="film-list-content"  data-role="content">
@@ -33,7 +34,6 @@
 <script src="scripts/jquery.dateFormat-1.0.js" type="text/javascript"></script>
 <script src="scripts/headerbar.js" type="text/javascript"></script>
 <script src="scripts/localstorage.js"></script>
-<script src="scripts/getfilm.js"></script>
 <script>
 /*$("#film-list-content").bind("scrollstop", function(event) {
 var pos = $("#film-list-content").scrollTop();

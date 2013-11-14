@@ -1,7 +1,9 @@
+
 var cnt = 0
 var ProgramItemArray = [];
 var DateItemArray = [];
 var FilmArray = [];
+if(AllSchedules==null){
 var AllSchedules = {
     hash: [],
     keys: [],
@@ -15,7 +17,7 @@ var AllSchedules = {
     	this.keys.push(key);
     	this.length++;
     }
-}
+}}
 var SPGroupContainer = {
     hash: [],
     keys: [],
@@ -107,6 +109,7 @@ function getFilm() {
 						dt.ends = this.endD;
 						dt.pi = pi;
 						dt.venue = this.venue;
+						dt.id = this.id;
 						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ fi.name+'"';
 		
 						AllSchedules.put(this.id,dt);
@@ -224,6 +227,7 @@ function moveToFilmDetails(ProgramItem){
 	$('#film-items').empty();
 	$('#film-sched').empty();
 	$('#film-details').html('');
+
 	$.each(ProgramItem.films,function(){
 		getSchedule(this)
 		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
@@ -293,7 +297,7 @@ function getSchedule(fi){
 		
 		$('#film-sched').append(item)
 		var checkedAttribute = false;
-            if (AllSchedules.get(this.id).isChosen) {
+            if (localStorage.getItem(this.id)!=null) {
                 checkedAttribute = true;
              }
         $('#checkbox-'+this.id).attr('checked', checkedAttribute);
@@ -330,11 +334,11 @@ function getSchedule(fi){
                      if (isChecked) { 
                      	AllSchedules.checked++;
                      	AllSchedules.get(schedule_id).isChosen = true;
-                    // 	localStorage.setItem(schedule_id,AllSchedules.get(schedule_id))
+                     	localStorage.setItem(schedule_id, AllSchedules.get(schedule_id).info)
                      }else{
 						AllSchedules.checked--;
                      	AllSchedules.get(schedule_id).isChosen = false;
-                    // 	localStorage.removeItem(schedule_id)
+                     	localStorage.removeItem(schedule_id)
                      }
 
                   });
@@ -367,11 +371,7 @@ function getSingleInfo(prop,pName){
 	else return '';
 }
 
-function setShowStyle(newstyle){
-	showstyle = newstyle
-}
-var showstyle = 'title'
-$('#title-btn').click(createLinkHandler(populateFilmListByName,ProgramItemArray));
-$('#date-btn').click(createLinkHandler(populateFilmListByDate,DateItemArray));
+//$('#title-btn').click(createLinkHandler(populateFilmListByName,ProgramItemArray));
+//$('#date-btn').click(createLinkHandler(populateFilmListByDate,DateItemArray));
+console.log(localStorage);
 $(getFilm);
-localStorage.clear()

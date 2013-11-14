@@ -1,5 +1,7 @@
+
 var cnt = 0
 var EventItemArray = [];
+if(AllSchedules==null){
 var AllSchedules = {
     hash: [],
     keys: [],
@@ -13,7 +15,7 @@ var AllSchedules = {
     	this.keys.push(key);
     	this.length++;
     }
-}
+}}
 var VenueArray = [];
 function getEvent() {
     $.ajax({
@@ -95,6 +97,11 @@ function populateEventList(EventItemArray){
 		var item = $('<li/>');
 		var link = $('<a/>').html(this.name);
 		link.click(createLinkHandler(moveToEventDetails,this));
+
+		/*var item = $('<li>'+this.name+'</li>')
+		item.on('click',function(){
+			moveToFilmDetails(this);
+		})*/
 		item.append(link)
 		$('#events').append(item);
 	})
@@ -176,5 +183,5 @@ function getSchedule(fi){
 function goBack() {
     history.go(-1);
 }
-
+console.log(AllSchedules);
 $(getEvent);

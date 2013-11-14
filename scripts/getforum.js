@@ -1,5 +1,6 @@
 var cnt = 0
 var ForumItemArray = [];
+if(AllSchedules==null){
 var AllSchedules = {
     hash: [],
     keys: [],
@@ -13,7 +14,7 @@ var AllSchedules = {
     	this.keys.push(key);
     	this.length++;
     }
-}
+}}
 var VenueArray = [];
 function getForum() {
     $.ajax({
@@ -173,5 +174,5 @@ function getSchedule(fi){
 function goBack() {
     history.go(-1);
 }
-
+console.log(AllSchedules);
 $(getForum);
