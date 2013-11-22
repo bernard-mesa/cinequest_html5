@@ -15,7 +15,52 @@ var AllSchedules = {
     	this.length++;
     }
 }}
-var VenueArray = [];
+var ForumItemContainer = {
+    hash: [],
+    keys: [],
+    length: 0,
+    get: function(key){
+    	return this.hash[key];
+    },
+    put: function(key, value){
+    	this.hash[key] = value;
+    	this.keys.push(key);
+    	this.length++;
+    }
+}
+if(VenueArray==null){
+var VenueArray = {
+    hash: [],
+    keys: [],
+    length: 0,
+    get: function(key){
+    	return this.hash[key];
+    },
+    put: function(key, value){
+    	this.hash[key] = value;
+    	this.keys.push(key);
+    	this.length++;
+    }
+}
+$(getVenue);
+}
+function getVenue(){
+	$.ajax({
+		type: "GET",
+		url: "venuelist.php",
+		dataType: "xml",
+		success: function(xml){
+			$(xml).find('Venue').each(function(){
+				var venid = $(this).find('ID');
+				venid = (venid.length>0) ? venid[0].textContent : '';
+				var venlocationlink = $(this).find('location');
+				venlocationlink = (venlocationlink.length>0) ? venlocationlink[0].textContent : '';
+				if(venid!='')
+				VenueArray.put(venid,venlocationlink);
+			})
+		}
+	});
+}
 function getForum() {
     $.ajax({
         type: "GET",
@@ -24,22 +69,24 @@ function getForum() {
         success: function(xml) {
             $(xml).find('Show').each(function(){
 				var pi = new Object();
-				var fi = new Object();
-				fi.schedules = [];
-				pi.films = [];
+				pi.properties = [];
+				pi.schedules = [];
+				pi.shortID = [];
+				pi.children = [];
+				pi.eventtype = '';
                 pi.id = $(this).find('ID')[0].textContent;
-                fi.id = pi.id;
 				pi.name = $(this).find('Name')[0].textContent;
-				fi.name = pi.name;
 				pi.dura = $(this).find('Duration')[0].textContent;
-				fi.dura = pi.dura;
 				pi.descript = $(this).find('ShortDescription')[0].textContent;
-				fi.descript = pi.descript;
 				pi.imgLink = $(this).find('EventImage').text();
-				fi.imgLink = pi.imgLink;
 				pi.infoLink = $(this).find('InfoLink').text();
-				fi.infoLink = pi.infoLink;
-				
+				$customProperties = $(this).find('CustomProperties').find('CustomProperty');
+				$customProperties.each(function(){
+					var key = $(this).find('Name').text();
+					var value = $(this).find('Value').text();
+					if(key == 'EventType') pi.eventtype = value;
+					if(key == 'ShortID') pi.shortID.push(value); 
+				});
 				$currentShowings = $(this).find('CurrentShowings').find('Showing');
 				$currentShowings.each(function(){
 					var show = new Object();
@@ -50,36 +97,42 @@ function getForum() {
 					$venue = $(this).find('Venue');
 					show.venue = new Object();
 					show.venue.id = $venue.find('VenueID').text();
-					show.venue.name = $venue.find('VenueName').text();
+					show.venue.name = $venue.find('VenueName').text().replace(/[^A-Z0-9]/g, '');
 					show.venue.address = $venue.find('VenueAddress1').text();
-					fi.schedules.push(show);
+					pi.schedules.push(show);
 				});
-				
-				if (fi.schedules.length > 0){
-					if (pi.descript.indexOf("Shorts Program") < 0){
-						pi.films.push(fi);
-					}
-					if(pi.name.indexOf("Shorts Program")!=0){
-						if(pi.name.indexOf("Forum") >= 0) ForumItemArray.push(pi);
-						
-					}
-					$.each(fi.schedules,function(){
+
+				$.each(pi.schedules,function(){
 						var dt = new Object();
 						dt.isChosen = false;
 						dt.dates = this.startD;
 						dt.ends = this.endD;
 						dt.pi = pi;
 						dt.venue = this.venue;
-						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ fi.name+'"';
+						dt.id = this.id;
+						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ pi.name+'"';
 		
 						AllSchedules.put(this.id,dt);
-					})
-				}
+				})
 				
+				if(pi.eventtype == "Forum"){
+					ForumItemContainer.put(pi.id,pi);
+				}
             });
 			
 			//at this point, the XML file has finished reading, begin manipulation here
 		
+		$.each(ForumItemContainer.keys,function(){
+				var curkey = this;
+				ForumItemContainer.get(curkey).children.push(ForumItemContainer.get(this));
+				
+				$.each(ForumItemContainer.get(curkey).shortID, function(){
+					ForumItemContainer.get(curkey).children.push(ForumItemContainer.get(this));
+				})
+				ForumItemArray.push(ForumItemContainer.get(curkey));
+
+			});
+
 		ForumItemArray.sort(compareByName);
 		populateForumList(ForumItemArray);
         }   
@@ -116,7 +169,7 @@ function moveToForumDetails(ProgramItem){
 	$.mobile.changePage('#forumdetailspage');
 	$('#forum-details').empty();
 	$('#event-sched').empty();
-	$.each(ProgramItem.films,function(){
+	$.each(ProgramItem.children,function(){
 		getSchedule(this)
 		var item = '<h4>'+ProgramItem.name+'</h4>'
 		item += '<p>' + getForumInfo(this) + '</p>'

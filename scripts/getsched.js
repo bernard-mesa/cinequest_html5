@@ -26,10 +26,10 @@ function loadcontents(){
 	}
 	else{
 		$.each(getAllKeys(),function(){
-			console.log(this+"")
 			var chosen = new Object();
 			chosen.id = this;
-			chosen.info = localStorage.getItem(this);
+		//	chosen.info = localStorage.getItem(this);
+			chosen.info = jQuery.parseJSON(localStorage.getItem(this)).info;
 			chosenSched.push(chosen)
 		})
 		console.log(chosenSched)

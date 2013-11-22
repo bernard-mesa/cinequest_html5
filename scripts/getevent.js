@@ -16,7 +16,53 @@ var AllSchedules = {
     	this.length++;
     }
 }}
-var VenueArray = [];
+var EventItemContainer = {
+    hash: [],
+    keys: [],
+    length: 0,
+    get: function(key){
+    	return this.hash[key];
+    },
+    put: function(key, value){
+    	this.hash[key] = value;
+    	this.keys.push(key);
+    	this.length++;
+    }
+}
+if(VenueArray==null){
+var VenueArray = {
+    hash: [],
+    keys: [],
+    length: 0,
+    get: function(key){
+    	return this.hash[key];
+    },
+    put: function(key, value){
+    	this.hash[key] = value;
+    	this.keys.push(key);
+    	this.length++;
+    }
+}
+$(getVenue);
+}
+function getVenue(){
+	$.ajax({
+		type: "GET",
+		url: "venuelist.php",
+		dataType: "xml",
+		success: function(xml){
+			$(xml).find('Venue').each(function(){
+				var venid = $(this).find('ID');
+				venid = (venid.length>0) ? venid[0].textContent : '';
+				var venlocationlink = $(this).find('location');
+				venlocationlink = (venlocationlink.length>0) ? venlocationlink[0].textContent : '';
+				if(venid!='')
+				VenueArray.put(venid,venlocationlink);
+			})
+		}
+	});
+}
+
 function getEvent() {
     $.ajax({
         type: "GET",
@@ -25,27 +71,23 @@ function getEvent() {
         success: function(xml) {
             $(xml).find('Show').each(function(){
 				var pi = new Object();
-				var fi = new Object();
-				fi.schedules = [];
-				fi.events = '';
-				pi.films = [];
+				pi.properties = [];
+				pi.schedules = [];
+				pi.shortID = [];
+				pi.children = [];
+				pi.eventtype = '';
                 pi.id = $(this).find('ID')[0].textContent;
-                fi.id = pi.id;
 				pi.name = $(this).find('Name')[0].textContent;
-				fi.name = pi.name;
 				pi.dura = $(this).find('Duration')[0].textContent;
-				fi.dura = pi.dura;
 				pi.descript = $(this).find('ShortDescription')[0].textContent;
-				fi.descript = pi.descript;
 				pi.imgLink = $(this).find('EventImage').text();
-				fi.imgLink = pi.imgLink;
 				pi.infoLink = $(this).find('InfoLink').text();
-				fi.infoLink = pi.infoLink;
 				$customProperties = $(this).find('CustomProperties').find('CustomProperty');
 				$customProperties.each(function(){
 					var key = $(this).find('Name').text();
 					var value = $(this).find('Value').text();
-					if(key == 'Events') fi.events += value + ', '; 
+					if(key == 'EventType') pi.eventtype = value;
+					if(key == 'ShortID') pi.shortID.push(value); 
 				});
 				$currentShowings = $(this).find('CurrentShowings').find('Showing');
 				$currentShowings.each(function(){
@@ -57,31 +99,41 @@ function getEvent() {
 					$venue = $(this).find('Venue');
 					show.venue = new Object();
 					show.venue.id = $venue.find('VenueID').text();
-					show.venue.name = $venue.find('VenueName').text();
+					show.venue.name = $venue.find('VenueName').text().replace(/[^A-Z0-9]/g, '');
 					show.venue.address = $venue.find('VenueAddress1').text();
-					fi.schedules.push(show);
+					pi.schedules.push(show);
 				});
-				
-				if (fi.events.length > 0){
-					pi.films.push(fi);
-					EventItemArray.push(pi);
 
-					$.each(fi.schedules,function(){
+				$.each(pi.schedules,function(){
 						var dt = new Object();
 						dt.isChosen = false;
 						dt.dates = this.startD;
 						dt.ends = this.endD;
 						dt.pi = pi;
 						dt.venue = this.venue;
-						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ fi.name+'"';
+						dt.id = this.id;
+						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ pi.name+'"';
 		
 						AllSchedules.put(this.id,dt);
-					})
-				}
+				})
 				
+				if(pi.eventtype == "Special"){
+					EventItemContainer.put(pi.id,pi);
+				}
             });
 			
 			//at this point, the XML file has finished reading, begin manipulation here
+		
+		$.each(EventItemContainer.keys,function(){
+				var curkey = this;
+				EventItemContainer.get(curkey).children.push(EventItemContainer.get(this));
+				
+				$.each(EventItemContainer.get(curkey).shortID, function(){
+					EventItemContainer.get(curkey).children.push(EventItemContainer.get(this));
+				})
+				EventItemArray.push(EventItemContainer.get(curkey));
+
+			});
 		
 		EventItemArray.sort(compareByName);
 		populateEventList(EventItemArray);
@@ -116,7 +168,7 @@ function moveToEventDetails(ProgramItem){
 	$.mobile.changePage('#eventdetailspage');
 	$('#event-details').empty();
 	$('#event-sched').empty();
-	$.each(ProgramItem.films,function(){
+	$.each(ProgramItem.children,function(){
 		getSchedule(this)
 
 		var item = '<h4>'+ProgramItem.name+'</h4>'
@@ -133,7 +185,6 @@ function getEventInfo(fi){
 	info += "<b>Title</b>: "  + fi.name + '<br>';
 	info += "<b>Duration</b>: " + fi.dura + '<br>';
 	info += "<b>Description</b>: " + fi.descript + '<br>';
-	info += '<b>Event Type</b>: '+ fi.events.substring(0,fi.events.length-2) + '<br>'
 	return info;
 }
 
@@ -185,5 +236,4 @@ function getSchedule(fi){
 function goBack() {
     history.go(-1);
 }
-console.log(AllSchedules);
 $(getEvent);

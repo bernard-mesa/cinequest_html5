@@ -18,7 +18,7 @@ var AllSchedules = {
     	this.length++;
     }
 }}
-var SPGroupContainer = {
+var ProgramItemContainer = {
     hash: [],
     keys: [],
     length: 0,
@@ -31,7 +31,7 @@ var SPGroupContainer = {
     	this.length++;
     }
 }
-var SPGroup = [];
+
 if(VenueArray==null){
 var VenueArray = {
     hash: [],
@@ -55,8 +55,11 @@ function getVenue(){
 		dataType: "xml",
 		success: function(xml){
 			$(xml).find('Venue').each(function(){
-				var venid = $(this).find('ID').textContent;
-				var venlocationlink = $(this).find('location').textContent;
+				var venid = $(this).find('ID');
+				venid = (venid.length>0) ? venid[0].textContent : '';
+				var venlocationlink = $(this).find('location');
+				venlocationlink = (venlocationlink.length>0) ? venlocationlink[0].textContent : '';
+				if(venid!='')
 				VenueArray.put(venid,venlocationlink);
 			})
 		}
@@ -71,46 +74,42 @@ function getFilm() {
         success: function(xml) {
             $(xml).find('Show').each(function(){
 				var pi = new Object();
-				var fi = new Object();
-				fi.properties = [];
-				fi.schedules = [];
-				fi.cast = '';
-				fi.director = '';
-				fi.genre = '';
-				fi.producer = '';
-				fi.writer = '';
-				fi.editor = '';
-				fi.cinematographer = '';
-				fi.country = '';
-				fi.languages = '';
-				fi.events = '';
+				pi.properties = [];
+				pi.schedules = [];
+				pi.shortID = [];
+				pi.children = [];
+				pi.cast = '';
+				pi.director = '';
+				pi.genre = '';
+				pi.producer = '';
+				pi.writer = '';
+				pi.editor = '';
+				pi.cinematographer = '';
+				pi.country = '';
+				pi.languages = '';
+				pi.eventtype = 'Film';
 				pi.films = [];
                 pi.id = $(this).find('ID')[0].textContent;
-                fi.id = pi.id;
 				pi.name = $(this).find('Name')[0].textContent;
-				fi.name = pi.name;
 				pi.dura = $(this).find('Duration')[0].textContent;
-				fi.dura = pi.dura;
 				pi.descript = $(this).find('ShortDescription')[0].textContent;
-				fi.descript = pi.descript;
 				pi.imgLink = $(this).find('EventImage').text();
-				fi.imgLink = pi.imgLink;
 				pi.infoLink = $(this).find('InfoLink').text();
-				fi.infoLink = pi.infoLink;
 				$customProperties = $(this).find('CustomProperties').find('CustomProperty');
 				$customProperties.each(function(){
 					var key = $(this).find('Name').text();
 					var value = $(this).find('Value').text();
-					if(key == 'Cast') fi.cast += value + ', ';
-					if(key == 'Director') fi.director += value + ', ';
-					if(key == 'Editor') fi.editor += value + ', ';
-					if(key == 'Cinematographer') fi.cinematographer += value + ', ';
-					if(key == 'Screenwriter') fi.writer += value + ', ';
-					if(key == 'Genre') fi.genre += value + ', ';
-					if(key == 'Producer') fi.producer += value + ', ';
-					if(key == 'Country') fi.country += value + ', ';
-					if(key == 'Language') fi.languages += value + ', '; 
-					if(key == 'Events') fi.events += value + ', '; 
+					if(key == 'Cast') pi.cast += value + ', ';
+					if(key == 'Director') pi.director += value + ', ';
+					if(key == 'Editor') pi.editor += value + ', ';
+					if(key == 'Cinematographer') pi.cinematographer += value + ', ';
+					if(key == 'Screenwriter') pi.writer += value + ', ';
+					if(key == 'Genre') pi.genre += value + ', ';
+					if(key == 'Producer') pi.producer += value + ', ';
+					if(key == 'Country') pi.country += value + ', ';
+					if(key == 'Language') pi.languages += value + ', '; 
+					if(key == 'EventType') pi.eventtype = value;
+					if(key == 'ShortID') pi.shortID.push(value); 
 				});
 				$currentShowings = $(this).find('CurrentShowings').find('Showing');
 				$currentShowings.each(function(){
@@ -124,82 +123,48 @@ function getFilm() {
 					show.venue.id = $venue.find('VenueID').text();
 					show.venue.name = $venue.find('VenueName').text().replace(/[^A-Z0-9]/g, '');
 					show.venue.address = $venue.find('VenueAddress1').text();
-					fi.schedules.push(show);
+					pi.schedules.push(show);
 				});
-				
-				if (fi.schedules.length > 0){
-					if (pi.descript.indexOf("Shorts Program") < 0){
-						pi.films.push(fi);
-					}
 
-					$.each(fi.schedules,function(){
+				$.each(pi.schedules,function(){
 						var dt = new Object();
 						dt.isChosen = false;
 						dt.dates = this.startD;
 						dt.ends = this.endD;
 						dt.pi = pi;
-						dt.venue = this.venue;
+						dt.ven_id = this.venue.id;
 						dt.id = this.id;
-						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ fi.name+'"';
-		
+						dt.info = $.format.date(this.startD, 'ddd, MMMM d') + ' ('+ $.format.date(this.startD, 'hh:mm a') + ' - '+$.format.date(this.endD, 'hh:mm a')+') --- '+ this.venue.name+': "'+ pi.name+'"';
+						
 						AllSchedules.put(this.id,dt);
-					})
-
-					if(pi.name.indexOf("Forum") < 0 && fi.events.length == 0){
-							$.each(fi.schedules,function(){
+				})
+				
+				if(pi.eventtype == "Film"){
+					$.each(pi.schedules,function(){
 								var dt = new Object();
 								dt.dates = this.startD;
 								dt.ends = this.endD;
 								dt.pi = pi;
 								DateItemArray.push(dt);
 							})
-						if(pi.name.indexOf("Shorts Program")!=0){
-						ProgramItemArray.push(pi);
-					}else{
-						SPGroupContainer.put(pi.name.substring(0,16),pi)
-					}
-					}
-
-					
-				}else{
-					if(pi.descript.indexOf("Part of Shorts Program")==0){
-						var key = pi.descript.substring(8,24);
-					}else if(pi.descript.indexOf("Plays with")==0){
-						var key = pi.descript.split('.')[0].substring(28);
-					}else if(pi.descript.indexOf("Plays before")==0){
-						var key = pi.descript.split('.')[0].substring(30);
-					}
-					SPGroup.push([key,fi]);
+					ProgramItemContainer.put(pi.id,pi);
 				}
-				FilmArray.push(fi);
-				
             });
 			
 			//at this point, the XML file has finished reading, begin manipulation here
 		
-			$.each(SPGroup,function(){
-				var piKey = this[0];
-				if(piKey != null){
-					if(SPGroupContainer.get(piKey)!=null){
-						SPGroupContainer.get(piKey).films.push(this[1]);
-					}else{
-						for(var i=0; i<ProgramItemArray.length; i++){
-							if(ProgramItemArray[i].name==piKey){
-								ProgramItemArray[i].films.push(this[1]);
-							}
-						}
-					}
-				}
+			$.each(ProgramItemContainer.keys,function(){
+				var curkey = this;
+				ProgramItemContainer.get(curkey).children.push(ProgramItemContainer.get(this));
+				
+				$.each(ProgramItemContainer.get(curkey).shortID, function(){
+					ProgramItemContainer.get(curkey).children.push(ProgramItemContainer.get(this));
+				})
+				ProgramItemArray.push(ProgramItemContainer.get(curkey));
+
 			});
 			
-			$.each(SPGroupContainer.keys,function(){
-				ProgramItemArray.push(SPGroupContainer.get(this));
-				
-			})
-		
-			
 			populateFilmListByName(ProgramItemArray);
-		
         }   
     }); 
 }
@@ -258,7 +223,7 @@ function moveToFilmDetails(ProgramItem){
 	$('#film-sched').empty();
 	$('#film-details').html('');
 
-	$.each(ProgramItem.films,function(){
+	$.each(ProgramItem.children,function(){
 		getSchedule(this)
 		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
 		item.append($('<h4>'+this.name+'</h4>'))
@@ -365,6 +330,10 @@ function getSchedule(fi){
                      	AllSchedules.checked++;
                      	AllSchedules.get(schedule_id).isChosen = true;
                      	localStorage.setItem(schedule_id, AllSchedules.get(schedule_id).info)
+                     	var schedven = new Object();
+                     	schedven.venid = AllSchedules.get(schedule_id).ven_id
+                     	schedven.info = AllSchedules.get(schedule_id).info
+                     	localStorage.setItem(schedule_id, JSON.stringify(schedven))
                      }else{
 						AllSchedules.checked--;
                      	AllSchedules.get(schedule_id).isChosen = false;
