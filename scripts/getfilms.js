@@ -64,6 +64,7 @@ function getVenue(){
 			})
 		}
 	});
+	console.log(VenueArray)
 }
 
 function getFilm() {
@@ -155,9 +156,10 @@ function getFilm() {
 		
 			$.each(ProgramItemContainer.keys,function(){
 				var curkey = this;
-				ProgramItemContainer.get(curkey).children.push(ProgramItemContainer.get(this));
+			//	ProgramItemContainer.get(curkey).children.push(ProgramItemContainer.get(this));
 				
 				$.each(ProgramItemContainer.get(curkey).shortID, function(){
+					ProgramItemContainer.get(this).schedules = ProgramItemContainer.get(curkey).schedules
 					ProgramItemContainer.get(curkey).children.push(ProgramItemContainer.get(this));
 				})
 				ProgramItemArray.push(ProgramItemContainer.get(curkey));
@@ -223,8 +225,11 @@ function moveToFilmDetails(ProgramItem){
 	$('#film-sched').empty();
 	$('#film-details').html('');
 
+	getSchedule(ProgramItem)
+	$('#film-items').append($('<p>' + getFilmInfo(ProgramItem) + '</p>'))
+
+	$('#film-items').append($('<br><p>Include</p>'))
 	$.each(ProgramItem.children,function(){
-		getSchedule(this)
 		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
 		item.append($('<h4>'+this.name+'</h4>'))
 		item.append($('<p>' + getFilmInfo(this) + '</p>'))
@@ -271,11 +276,11 @@ function getTimeVal(dateitem){
 
 function getFilmInfo(fi){
 	var info = '<img src="'+ fi.imgLink +'"/> <br>';
-	info += '<a href="' + fi.infoLink + '">Link</a><br>'
 	info += "<b>Title</b>: "  + fi.name + '<br>';
 	info += "<b>Duration</b>: " + fi.dura + '<br>';
 	info += "<b>Description</b>: " + fi.descript + '<br>';
 	info += getFilmProperties(fi);
+	info += '<a href="' + fi.infoLink + '">more info...</a><br>'
 	return info;
 }
 
@@ -288,8 +293,9 @@ function getSchedule(fi){
 		var dates = $.format.date(this.startD, 'ddd, MMMM d')
 		var sTime = $.format.date(this.startD, 'hh:mm a')
 		var eTime = $.format.date(this.endD, 'hh:mm a')
-		var item = $('<fieldset data-role="controlgroup"><input type="checkbox" name="checkbox-'+this.id+'" title="'+dates+'" id="checkbox-'+this.id+'" class="custom"/>'+dates + ', '+ sTime + ' - ' + eTime +'<br>')
+		var item = $('<fieldset data-role="controlgroup"><input type="checkbox" name="checkbox-'+this.id+'" title="'+dates+'" id="checkbox-'+this.id+'" class="custom"/>'+dates + ', '+ sTime + ' - ' + eTime +' at <a href="'+VenueArray.get(this.venue.id)+'">'+venue+'</a><br>')
 		
+		//console.log(VenueArray.get(curvenid).venlocationlink)
 		$('#film-sched').append(item)
 		var checkedAttribute = false;
             if (localStorage.getItem(this.id)!=null) {

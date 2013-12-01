@@ -124,9 +124,10 @@ function getForum() {
 		
 		$.each(ForumItemContainer.keys,function(){
 				var curkey = this;
-				ForumItemContainer.get(curkey).children.push(ForumItemContainer.get(this));
+			//	ForumItemContainer.get(curkey).children.push(ForumItemContainer.get(this));
 				
 				$.each(ForumItemContainer.get(curkey).shortID, function(){
+					ForumItemContainer.get(this).schedules = ForumItemContainer.get(curkey).schedules
 					ForumItemContainer.get(curkey).children.push(ForumItemContainer.get(this));
 				})
 				ForumItemArray.push(ForumItemContainer.get(curkey));
@@ -168,9 +169,11 @@ function createLinkHandler(f,i){
 function moveToForumDetails(ProgramItem){
 	$.mobile.changePage('#forumdetailspage');
 	$('#forum-details').empty();
-	$('#event-sched').empty();
+	$('#forum-sched').empty();
+	getSchedule(ProgramItem)
+	$('#forum-details').append($('<p>' + getForumInfo(ProgramItem) + '</p>'))
+
 	$.each(ProgramItem.children,function(){
-		getSchedule(this)
 		var item = '<h4>'+ProgramItem.name+'</h4>'
 		item += '<p>' + getForumInfo(this) + '</p>'
 		$('#forum-details').append(item);
@@ -181,10 +184,10 @@ function moveToForumDetails(ProgramItem){
 
 function getForumInfo(fi){
 	var info = '<img src="'+ fi.imgLink +'"/> <br>';
-	info += '<a href="' + fi.infoLink + '">Link</a><br>'
 	info += "<b>Title</b>: "  + fi.name + '<br>';
 	info += "<b>Duration</b>: " + fi.dura + '<br>';
 	info += "<b>Description</b>: " + fi.descript + '<br>';
+	info += '<a href="' + fi.infoLink + '">more info...</a><br>'
 	return info;
 }
 

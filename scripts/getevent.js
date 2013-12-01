@@ -129,6 +129,7 @@ function getEvent() {
 				EventItemContainer.get(curkey).children.push(EventItemContainer.get(this));
 				
 				$.each(EventItemContainer.get(curkey).shortID, function(){
+					EventItemContainer.get(this).schedules = EventItemContainer.get(curkey).schedules
 					EventItemContainer.get(curkey).children.push(EventItemContainer.get(this));
 				})
 				EventItemArray.push(EventItemContainer.get(curkey));
@@ -168,9 +169,10 @@ function moveToEventDetails(ProgramItem){
 	$.mobile.changePage('#eventdetailspage');
 	$('#event-details').empty();
 	$('#event-sched').empty();
-	$.each(ProgramItem.children,function(){
-		getSchedule(this)
+	getSchedule(ProgramItem)
+	$('#event-details').append($('<p>' + getEventInfo(ProgramItem) + '</p>'))
 
+	$.each(ProgramItem.children,function(){
 		var item = '<h4>'+ProgramItem.name+'</h4>'
 		item += '<p>' + getEventInfo(this) + '</p>'
 		$('#event-details').append(item);
@@ -181,10 +183,10 @@ function moveToEventDetails(ProgramItem){
 
 function getEventInfo(fi){
 	var info = '<img src="'+ fi.imgLink +'"/> <br>';
-	info += '<a href="' + fi.infoLink + '">Link</a><br>'
 	info += "<b>Title</b>: "  + fi.name + '<br>';
 	info += "<b>Duration</b>: " + fi.dura + '<br>';
 	info += "<b>Description</b>: " + fi.descript + '<br>';
+	info += '<a href="' + fi.infoLink + '">more info...</a><br>'
 	return info;
 }
 

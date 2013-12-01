@@ -1,28 +1,20 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<NewsFeed> 
+ <LastUpdated><![CDATA[2013-11-26T15:42:20]]></LastUpdated>
+<ArrayOfNews>
+    <News>
+	<Name><![CDATA[Meet the Festival Organizers]]></Name>
+	<ShortDescription><![CDATA[[Get to know our staff of interns, volunteers and professionals who are working hard to bring Cinequest 24 to you]]></ShortDescription>
+	<EventImage><![CDATA[http://www.cinequest.org/sites/default/files/cqff24_news_CROP.png]]></EventImage>
+	<InfoLink><![CDATA[http://www.cinequest.org/meet-the-team]]></InfoLink>
+    </News>
 
-<!-- link types: "item" leads to the corresponding numeric xml file located in ../mobile_items/###.xml; "film" leads to ../mobileCQ.php?type=film&id=FID; "dvd" leads to ../mobileCQ.php?type=dvd&id=# -->
-<!-- Tuesday, March 3 -->
-
-<mobileAppHome> 
- <LastUpdated><![CDATA[20131120 23:03:01]]></LastUpdated>
-	<section name="Header">
-		<item>
-		<imageURL>http://mobile.cinequest.org/imgs/mobile/creative.gif</imageURL>
-		</item>
-	</section>	
-	<section name="Top News">
-		<item>
-			<title>CQFF23 - Unleash</title>
-			<date>2013-03-10 19:00:00</date>
-			<link type="item" id="005"/>
-			<imageURL>http://mobile.cinequest.org/imgs/mobile/importantimg.gif</imageURL>
-		</item>
-	</section>
-	<section name="Cinequest News">
-		<item>
-			<title>Picture the Possibilities</title>
-			<date></date>
-			<link type="item" id="006"/>
-		</item>
-	</section>
-</mobileAppHome>
+    <News>
+	<Name><![CDATA[7 Lives]]></Name>
+	<ShortDescription><![CDATA[Pay Special Attention to these Baloons]]></ShortDescription>
+	<EventImage><![CDATA[http://payments.cinequest.org/images/user/CINEQ_2198/2013Features\CQFF23_1000x316_7LivesOfChance_02.jpg]]></EventImage>
+	<ThumbImage><![CDATA[http://payments.cinequest.org/images/user/CINEQ_2198/2013Features\lifeofchance_250x104.jpg]]></ThumbImage>
+	<InfoLink>6906</InfoLink>
+   </News>	
+</ArrayOfNews>
+</NewsFeed>
