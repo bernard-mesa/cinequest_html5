@@ -32,7 +32,7 @@ var ProgramItemContainer = {
 function getNews(){
 	$.ajax({
 		type: "GET",
-		url: "news.php",
+		url: "http://www.cinequest.org/news.php",
 		dataType: "xml",
 		success: function(xml){
 			$(xml).find('News').each(function(){
