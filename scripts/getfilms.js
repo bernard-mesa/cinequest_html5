@@ -52,6 +52,7 @@ function getVenue(){
 	$.ajax({
 		type: "GET",
 		url: "http://www.cinequest.org/venuelist.php",
+	//	url: "venuelist.php",
 		dataType: "xml",
 		success: function(xml){
 			$(xml).find('Venue').each(function(){
@@ -71,6 +72,7 @@ function getFilm() {
     $.ajax({
         type: "GET",
         url: "http://payments.cinequest.org/websales/feed.ashx?guid=70d8e056-fa45-4221-9cc7-b6dc88f62c98&showslist=true&",
+    //	url: "newcinequest.xml",
         dataType: "xml",
         success: function(xml) {
             $(xml).find('Show').each(function(){

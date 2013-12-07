@@ -48,6 +48,7 @@ function getVenue(){
 	$.ajax({
 		type: "GET",
 		url: "http://www.cinequest.org/venuelist.php",
+	//	url: "venuelist.php",
 		dataType: "xml",
 		success: function(xml){
 			$(xml).find('Venue').each(function(){
@@ -65,6 +66,7 @@ function getForum() {
     $.ajax({
         type: "GET",
         url: "http://payments.cinequest.org/websales/feed.ashx?guid=70d8e056-fa45-4221-9cc7-b6dc88f62c98&showslist=true&",
+    //    url: "newcinequest.xml",
         dataType: "xml",
         success: function(xml) {
             $(xml).find('Show').each(function(){
@@ -172,11 +174,15 @@ function moveToForumDetails(ProgramItem){
 	$('#forum-sched').empty();
 	getSchedule(ProgramItem)
 	$('#forum-details').append($('<p>' + getForumInfo(ProgramItem) + '</p>'))
+	$('#forum-details').append($('<br><p>Include</p>'))
 
 	$.each(ProgramItem.children,function(){
-		var item = '<h4>'+ProgramItem.name+'</h4>'
-		item += '<p>' + getForumInfo(this) + '</p>'
+		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
+		item.append($('<h4>'+this.name+'</h4>'))
+		item.append($('<p>' + getForumInfo(this) + '</p>'))
 		$('#forum-details').append(item);
+		$('#forum-details').find('div[data-role=collapsible]').collapsible();
+
 	})
 }
 

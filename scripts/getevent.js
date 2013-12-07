@@ -49,6 +49,7 @@ function getVenue(){
 	$.ajax({
 		type: "GET",
 		url: "http://www.cinequest.org/venuelist.php",
+	//	url: "venuelist.php",
 		dataType: "xml",
 		success: function(xml){
 			$(xml).find('Venue').each(function(){
@@ -67,6 +68,7 @@ function getEvent() {
     $.ajax({
         type: "GET",
         url: "http://payments.cinequest.org/websales/feed.ashx?guid=70d8e056-fa45-4221-9cc7-b6dc88f62c98&showslist=true&",
+    //	url: "newcinequest.xml",
         dataType: "xml",
         success: function(xml) {
             $(xml).find('Show').each(function(){
@@ -126,7 +128,7 @@ function getEvent() {
 		
 		$.each(EventItemContainer.keys,function(){
 				var curkey = this;
-				EventItemContainer.get(curkey).children.push(EventItemContainer.get(this));
+			//	EventItemContainer.get(curkey).children.push(EventItemContainer.get(this));
 				
 				$.each(EventItemContainer.get(curkey).shortID, function(){
 					EventItemContainer.get(this).schedules = EventItemContainer.get(curkey).schedules
@@ -171,11 +173,14 @@ function moveToEventDetails(ProgramItem){
 	$('#event-sched').empty();
 	getSchedule(ProgramItem)
 	$('#event-details').append($('<p>' + getEventInfo(ProgramItem) + '</p>'))
+	$('#event-details').append($('<br><p>Include</p>'))
 
 	$.each(ProgramItem.children,function(){
-		var item = '<h4>'+ProgramItem.name+'</h4>'
-		item += '<p>' + getEventInfo(this) + '</p>'
+		var item = $('<div data-role="collapsible" data-theme="b" data-content-theme="d"/>')
+		item.append($('<h4>'+this.name+'</h4>'))
+		item.append($('<p>' + getEventInfo(this) + '</p>'))
 		$('#event-details').append(item);
+		$('#event-details').find('div[data-role=collapsible]').collapsible();
 	})
 }
 

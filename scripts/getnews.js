@@ -33,6 +33,7 @@ function getNews(){
 	$.ajax({
 		type: "GET",
 		url: "http://www.cinequest.org/news.php",
+	//	url: "news.php",
 		dataType: "xml",
 		success: function(xml){
 			$(xml).find('News').each(function(){
@@ -49,13 +50,18 @@ function getNews(){
 	});
 }
 
-
 function getItem() {
+	$.ajaxSetup ({
+    	cache: true
+	});
+
     $.ajax({
         type: "GET",
-        url: "newcinequest.xml",
+        url: "http://payments.cinequest.org/websales/feed.ashx?guid=70d8e056-fa45-4221-9cc7-b6dc88f62c98&showslist=true&",   
+    //    url: "newcinequest.xml",
         dataType: "xml",
         success: function(xml) {
+        	
             $(xml).find('Show').each(function(){
 				var pi = new Object();
 				pi.properties = [];
