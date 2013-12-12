@@ -65,7 +65,6 @@ function getVenue(){
 			})
 		}
 	});
-	console.log(VenueArray)
 }
 
 function getFilm() {
@@ -168,7 +167,8 @@ function getFilm() {
 
 			});
 			
-			populateFilmListByName(ProgramItemArray);
+		//	populateFilmListByName(ProgramItemArray);
+			populateFilmListByDate(DateItemArray);
         }   
     }); 
 }
@@ -380,5 +380,4 @@ function getSingleInfo(prop,pName){
 
 //$('#title-btn').click(createLinkHandler(populateFilmListByName,ProgramItemArray));
 //$('#date-btn').click(createLinkHandler(populateFilmListByDate,DateItemArray));
-console.log(localStorage);
 $(getFilm);

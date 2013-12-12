@@ -10,6 +10,14 @@
     <script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>         
 </head>
 <body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 <div data-role="page" id="eventspage">
     <header data-role="header" data-position="fixed">
 
@@ -31,7 +39,7 @@
   <div data-role="content" id="cont">
     <div style="font-size: 0.8em;">
       <a href="#" data-role="button" onClick="goBack()" data-inline="true" data-icon="arrow-l">Events</a>
-      <a><img src="img/fshare.png"></a>
+      <div class="fb-share-button" data-href="http://developers.facebook.com/docs/plugins/" data-type="button"></div>
     </div>
     <b>Schedules</b>
     <div data-role="content" id="event-sched">
